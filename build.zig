@@ -266,9 +266,10 @@ fn buildLuaJIT(b: *Build, target: Build.ResolvedTarget, optimize: std.builtin.Op
     if (target.result.ptrBitWidth() == 64) dynasm_run.addArgs(&.{ "-D", "P64" });
     dynasm_run.addArgs(&.{ "-D", "JIT", "-D", "FFI" });
 
-    if (target.result.abi.floatAbi() == .hard) {
-        dynasm_run.addArgs(&.{ "-D", "FPU", "-D", "HFABI" });
-    }
+    dynasm_run.addArgs(&.{ "-D", switch (target.result.getFloatAbi()) {
+        .hard => "FPU",
+        .soft => "HFABI",
+    }});
 
     if (target.result.os.tag == .windows) dynasm_run.addArgs(&.{ "-D", "WIN" });
 
